@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Teacher Control</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<audio id="openSound">
+<source src="openroom.mp3">
+</audio>
+  
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+
+const firebaseConfig = {
+
+apiKey:"AIzaSyDbSeuQXpHWcicxZNJNM_0HN57XQZ7_9VI",
+
+authDomain:"base-de-datos-938d3.firebaseapp.com",
+
+databaseURL:"https://base-de-datos-938d3-default-rtdb.firebaseio.com",
+
+projectId:"base-de-datos-938d3",
+
+storageBucket:"base-de-datos-938d3.firebasestorage.app",
+
+messagingSenderId:"170478210181",
+
+appId:"1:170478210181:web:3738fc691d905004846dec",
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+</script>
+  
+<script>
+
+let pass = prompt("Teacher password:");
+
+if(pass !== "teacher1230"){
+alert("Access denied");
+location.href="index.html";
+}
+
+</script>
+
+<img id="qrCode" src="qrcode.png">
+
+<!-- 🔥 CONTENEDOR REAL -->
+<div id="teacherContainer">
+
+<div id="teacherBox">
+
+<h1>🎮 Teacher Control</h1>
+
+<div id="teacherTimer" class="retroTimer">
+⏱ TIME: <span id="teacherTimeText">--</span>
+</div>
+
+<audio id="timeOverSound">
+<source src="notime.mp3">
+</audio>
+
+Room Code:
+
+<br>
+
+<input id="roomInput">
+
+<br><br>
+
+Game Time (Minutes):
+
+<br>
+
+<input 
+id="timeInput"
+type="number"
+min="1"
+max="60"
+step="1"
+value="8"
+class="timeSelector"
+>
+
+<button class="teacherBtn" onclick="openRoom()">Open Room</button>
+
+<button class="teacherBtn" onclick="startGame()">Start Game</button>
+
+<button class="teacherBtn" onclick="goToFinalRanking()">
+🏆 Final Ranking
+</button>
+
+</div>
+
+<!-- PANEL DERECHO -->
+<div id="playersPanel">
+    <h2>👥 Players</h2>
+    <div id="playersList"></div>
+</div>
+
+<canvas id="watchCanvas" width="250" height="500"></canvas>
+
+</div> <!-- ← ESTE CIERRA teacherContainer -->
+
+<script>
+
+let roomCode="";
+
+let teacherTimerInterval;
+
+let selectedPlayer = null;
+
+let currentQuiz = null;
+
+// 🔥 CANVAS VIEWER
+const viewCanvas = document.getElementById("watchCanvas");
+const viewCtx = viewCanvas.getContext("2d");
+
+const COLS = 10;
+const ROWS = 20;
+const SIZE = 25;
+
+viewCanvas.width = COLS * SIZE;
+viewCanvas.height = ROWS * SIZE;
+
+const colors = [
+null,
+"cyan",
+"yellow",
+"purple",
+"green",
+"red",
+"blue",
+"orange"
+];
+
+function drawFullGame(board, piece){
+
+if(!board) return;
+
+viewCtx.clearRect(0,0,viewCanvas.width,viewCanvas.height);
+
+// 🔲 dibujar tablero
+for(let y=0; y<ROWS; y++){
+for(let x=0; x<COLS; x++){
+
+let value = board[y][x];
+
+if(value){
+viewCtx.fillStyle = colors[value];
+viewCtx.fillRect(x*SIZE, y*SIZE, SIZE, SIZE);
+viewCtx.strokeRect(x*SIZE, y*SIZE, SIZE, SIZE);
+}
+
+}
+}
+
+// 🔥 dibujar pieza cayendo (ESTO ES LA MAGIA)
+if(piece){
+
+piece.shape.forEach((row,y)=>{
+row.forEach((value,x)=>{
+
+if(value){
+
+viewCtx.fillStyle = colors[value];
+
+viewCtx.fillRect(
+(piece.x + x)*SIZE,
+(piece.y + y)*SIZE,
+SIZE,
+SIZE
+);
+
+viewCtx.strokeRect(
+(piece.x + x)*SIZE,
+(piece.y + y)*SIZE,
+SIZE,
+SIZE
+);
+
+}
+
+});
+});
+
+}
+
+// 🎯 DIBUJAR QUIZ COMO OVERLAY
+if(currentQuiz){
+
+drawQuizOverlay(currentQuiz);
+
+}
+
+}
+
+function drawQuizOverlay(quiz){
+
+// fondo oscuro transparente
+viewCtx.fillStyle = "rgba(0,0,0,0.7)";
+viewCtx.fillRect(0, 150, viewCanvas.width, 200);
+
+// pregunta
+viewCtx.fillStyle = "#00ffff";
+viewCtx.font = "14px monospace";
+
+wrapText(viewCtx, quiz.question, 10, 170, 230, 18);
+
+// respuestas
+quiz.answers.forEach((ans, i)=>{
+
+let y = 210 + i*30;
+
+// colores según respuesta
+if(quiz.selected !== null){
+
+if(i === quiz.correct){
+viewCtx.fillStyle = "green";
+}
+else if(i === quiz.selected){
+viewCtx.fillStyle = "red";
+}
+else{
+viewCtx.fillStyle = "white";
+}
+
+}else{
+viewCtx.fillStyle = "white";
+}
+
+viewCtx.fillText(ans, 10, y);
+
+});
+
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+
+let words = text.split(' ');
+let line = '';
+
+for(let n = 0; n < words.length; n++){
+
+let testLine = line + words[n] + ' ';
+let metrics = ctx.measureText(testLine);
+let testWidth = metrics.width;
+
+if(testWidth > maxWidth && n > 0){
+
+ctx.fillText(line, x, y);
+line = words[n] + ' ';
+y += lineHeight;
+
+}else{
+line = testLine;
+}
+
+}
+
+ctx.fillText(line, x, y);
+
+}
+
+function drawBoard(board){
+
+if(!board) return;
+
+viewCtx.clearRect(0,0,viewCanvas.width,viewCanvas.height);
+
+for(let y=0; y<ROWS; y++){
+for(let x=0; x<COLS; x++){
+
+let value = board[y][x];
+
+if(value){
+viewCtx.fillStyle = colors[value];
+viewCtx.fillRect(x*SIZE, y*SIZE, SIZE, SIZE);
+viewCtx.strokeRect(x*SIZE, y*SIZE, SIZE, SIZE);
+}
+
+}
+}
+
+}
+
+function openRoom(){
+
+roomCode = document.getElementById("roomInput").value;
+
+firebase.database()
+.ref("rooms/"+roomCode)
+.set({
+status:"waiting",
+startTime:0,
+players:{},
+firstTry:{}
+});
+
+listenPlayers();
+watchGame();
+
+// 🔊 sonido
+document.getElementById("openSound").play();
+
+// ✨ animación botón
+let btn = document.querySelector(".teacherBtn");
+
+btn.classList.add("roomActive");
+
+}
+
+function startGame(){
+
+let btns = document.querySelectorAll(".teacherBtn");
+let startBtn = btns[1]; // segundo botón
+
+// animación arcade
+startBtn.style.transform="scale(1.1)";
+startBtn.style.boxShadow="0 0 20px #00ffff";
+startBtn.classList.add("roomActive");
+
+// sonido de inicio
+let startSound = new Audio("start.mp3");
+startSound.volume = 0.6;
+startSound.play();
+
+let minutes = document.getElementById("timeInput").value;
+
+if(!minutes){
+minutes = 8;
+}
+
+let seconds = minutes * 60;
+
+firebase.database()
+.ref("rooms/"+roomCode)
+.update({
+status:"playing",
+startTime: Date.now(),
+gameTime: seconds
+});
+startTeacherTimer();
+}
+
+function listenPlayers(){
+
+firebase.database()
+.ref("rooms/"+roomCode+"/players")
+.on("value", snap=>{
+
+let data = snap.val();
+
+if(!data) return;
+
+let html="";
+
+Object.values(data).forEach(p=>{
+
+html += `
+<button onclick="watchPlayer('${p.name}')">
+${p.name} — ${p.score}
+</button><br>
+`;
+
+});
+
+document.getElementById("playersList").innerHTML = html;
+
+// 🔥 volver a aplicar selección visual
+highlightSelectedPlayer();
+
+});
+
+}
+
+function watchGame(){
+
+firebase.database()
+.ref("rooms/"+roomCode+"/gameStates")
+.on("value", snap=>{
+
+let data = snap.val();
+
+if(!data) return;
+
+// obtener jugador seleccionado
+firebase.database()
+.ref("rooms/"+roomCode+"/selectedPlayer")
+.once("value", s=>{
+
+let selected = s.val();
+
+if(!selected || !data[selected]) return;
+
+let game = data[selected];
+
+if(game.quiz){
+
+currentQuiz = game.quiz;
+
+}else{
+
+currentQuiz = null;
+
+}
+
+console.log("🎮 estado jugador:", game);
+
+drawFullGame(game.board, game.piece);
+
+});
+
+});
+
+}
+
+function goToFinalRanking(){
+
+if(!roomCode){
+alert("Open a room first");
+return;
+}
+
+window.open("index.html?final="+roomCode, "_blank");
+
+}
+  
+function watchPlayer(playerId){
+
+selectedPlayer = playerId; // 🔥 guardar local
+
+firebase.database()
+.ref("rooms/"+roomCode)
+.update({
+selectedPlayer: playerId
+});
+
+console.log("👀 Viendo jugador:", playerId);
+
+// 🔥 actualizar estilos visuales
+highlightSelectedPlayer();
+
+}
+
+function highlightSelectedPlayer(){
+
+let buttons = document.querySelectorAll("#playersList button");
+
+buttons.forEach(btn => {
+
+if(btn.innerText.includes(selectedPlayer)){
+
+btn.classList.add("activePlayer");
+
+}else{
+
+btn.classList.remove("activePlayer");
+
+}
+
+});
+
+}
+
+function startTeacherTimer(){
+
+firebase.database()
+.ref("rooms/"+roomCode)
+.on("value", snapshot => {
+
+let data = snapshot.val();
+
+if(!data) return;
+
+let start = data.startTime;
+let limit = data.gameTime;
+
+if(!start || !limit) return;
+
+if(teacherTimerInterval){
+clearInterval(teacherTimerInterval);
+}
+
+teacherTimerInterval = setInterval(()=>{
+
+let now = Date.now();
+
+let secondsPassed = Math.floor((now - start)/1000);
+let remaining = limit - secondsPassed;
+
+if(remaining < 0) remaining = 0;
+
+// mostrar tiempo
+document.getElementById("teacherTimeText").innerText = remaining;
+
+// 🚨 cuando termina
+if(remaining <= 0){
+
+clearInterval(teacherTimerInterval);
+
+// efecto rojo retro
+let timerBox = document.getElementById("teacherTimer");
+timerBox.classList.add("timeDanger");
+
+// 🔊 sonido
+document.getElementById("timeOverSound").play();
+
+}
+
+},1000);
+
+});
+
+}
+
+</script>
+
+</body>
+
+</html>
+
+
+
+
