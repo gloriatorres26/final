@@ -475,24 +475,30 @@ btn.classList.remove("activePlayer");
 
 function startTeacherTimer(){
 
+let start = 0;
+let limit = 0;
+
+// 🔥 escuchar SOLO los datos necesarios
 firebase.database()
-.ref("rooms/"+roomCode)
-.on("value", snapshot => {
+.ref("rooms/"+roomCode+"/startTime")
+.on("value", snap => {
+   start = snap.val();
+});
 
-let data = snapshot.val();
+firebase.database()
+.ref("rooms/"+roomCode+"/gameTime")
+.on("value", snap => {
+   limit = snap.val();
+});
 
-if(!data) return;
-
-let start = data.startTime;
-let limit = data.gameTime;
-
-if(!start || !limit) return;
-
+// 🚀 iniciar UNA sola vez
 if(teacherTimerInterval){
-clearInterval(teacherTimerInterval);
+   clearInterval(teacherTimerInterval);
 }
 
 teacherTimerInterval = setInterval(()=>{
+
+if(!start || !limit) return;
 
 let now = Date.now();
 
@@ -509,18 +515,16 @@ if(remaining <= 0){
 
 clearInterval(teacherTimerInterval);
 
-// efecto rojo retro
+// efecto rojo retro (LO CONSERVAMOS)
 let timerBox = document.getElementById("teacherTimer");
 timerBox.classList.add("timeDanger");
 
-// 🔊 sonido
+// 🔊 sonido (LO CONSERVAMOS)
 document.getElementById("timeOverSound").play();
 
 }
 
 },1000);
-
-});
 
 }
 
