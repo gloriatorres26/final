@@ -490,7 +490,7 @@ roomCode = room;
 activateRealtimeRanking();
 
 firebase.database()
-.ref("rooms/"+roomCode+"/players/"+playerName)
+.ref("rooms/"+roomCode+"/players/"+playerId)
 .set({
    name: playerName,
    score: 0
@@ -964,7 +964,7 @@ drawRanking();
 
 // 🔥 Guardar en Firebase
 firebase.database()
-.ref("rooms/"+roomCode+"/players/"+playerName)
+.ref("rooms/"+roomCode+"/players/"+playerId)
 .set({
    name: playerName,
    score: score
@@ -1118,7 +1118,7 @@ scoreText.innerText = score;
     
 // resetear score en ranking también
 firebase.database()
-.ref("rooms/"+roomCode+"/players/"+playerName)
+.ref("rooms/"+roomCode+"/players/"+playerId)
 .set({
    name: playerName,
    score: 0
