@@ -538,6 +538,27 @@ document.getElementById("timeOverSound").play();
 
 }
 
+const qr = document.getElementById("qrCode");
+const modal = document.getElementById("qrModal");
+const closeBtn = document.getElementById("closeQR");
+
+// abrir modal
+qr.addEventListener("click", () => {
+  modal.classList.remove("hidden");
+});
+
+// cerrar con X
+closeBtn.addEventListener("click", () => {
+  modal.classList.add("hidden");
+});
+
+// cerrar si hacen click fuera de la imagen
+modal.addEventListener("click", (e) => {
+  if(e.target === modal){
+    modal.classList.add("hidden");
+  }
+});
+  
 </script>
 
 </body>
