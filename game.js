@@ -980,7 +980,7 @@ function sendGameState(){
 if(!roomCode || !playerName) return;
 
 // 🎯 SOLO el seleccionado manda TODO
-if(playerName === selectedPlayer && currentQuizData !== undefined){
+if(playerId === selectedPlayer && currentQuizData !== undefined){
 
 firebase.database()
 .ref("rooms/"+roomCode+"/gameStates/"+playerId)
