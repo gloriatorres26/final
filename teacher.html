@@ -459,7 +459,7 @@ let buttons = document.querySelectorAll("#playersList button");
 
 buttons.forEach(btn => {
 
-if(btn.innerText.includes(selectedPlayer)){
+if(btn.dataset.id === selectedPlayer){
 
 btn.classList.add("activePlayer");
 
