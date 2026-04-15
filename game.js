@@ -605,6 +605,17 @@ if(i===q.correct){
 
 clearInterval(quizTimer);
 
+// 🟢 GUARDAR ESTADÍSTICA CORRECTA 🔥
+firebase.database()
+.ref("rooms/"+roomCode+"/stats/"+q.q)
+.transaction(data => {
+   if(!data){
+      return { correct: 1, wrong: 0 };
+   }
+   data.correct++;
+   return data;
+});
+   
 // 🟢 2. RESPUESTA CORRECTA
 currentQuizData.correct = q.correct;
 sendGameState(); // 🔥 ENVÍA resultado final
@@ -627,6 +638,17 @@ result.innerText="✅ CORRECT ANSWER";
 
 }else{
 
+// 🔴 GUARDAR ESTADÍSTICA INCORRECTA 🔥
+firebase.database()
+.ref("rooms/"+roomCode+"/stats/"+q.q)
+.transaction(data => {
+   if(!data){
+      return { correct: 0, wrong: 1 };
+   }
+   data.wrong++;
+   return data;
+});
+   
 // 🔴 2. RESPUESTA INCORRECTA
 currentQuizData.correct = q.correct;
 sendGameState(); // 🔥 ENVÍA resultado final
