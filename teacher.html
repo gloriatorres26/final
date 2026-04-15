@@ -368,7 +368,7 @@ let html="";
 Object.values(data).forEach(p=>{
 
 html += `
-<button onclick="watchPlayer('${p.id}')">
+<button data-id="${p.id}" onclick="watchPlayer('${p.id}')">
 ${p.name} — ${p.score}
 </button><br>
 `;
