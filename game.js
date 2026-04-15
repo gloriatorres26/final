@@ -605,12 +605,18 @@ if(i===q.correct){
 
 clearInterval(quizTimer);
 
-// 🟢 GUARDAR ESTADÍSTICA CORRECTA 🔥
+// 🟢 GUARDAR ESTADÍSTICA
+let questionId = "q_" + btoa(q.q).replace(/=/g, "");
+
 firebase.database()
-.ref("rooms/"+roomCode+"/stats/"+q.q)
+.ref("rooms/"+roomCode+"/stats/"+questionId)
 .transaction(data => {
    if(!data){
-      return { correct: 1, wrong: 0 };
+      return { 
+         question: q.q, // 🔥 IMPORTANTE
+         correct: 1, 
+         wrong: 0 
+      };
    }
    data.correct++;
    return data;
@@ -638,12 +644,20 @@ result.innerText="✅ CORRECT ANSWER";
 
 }else{
 
-// 🔴 GUARDAR ESTADÍSTICA INCORRECTA 🔥
+clearInterval(quizTimer);
+
+// 🔴 GUARDAR ESTADÍSTICA
+let questionId = "q_" + btoa(q.q).replace(/=/g, "");
+
 firebase.database()
-.ref("rooms/"+roomCode+"/stats/"+q.q)
+.ref("rooms/"+roomCode+"/stats/"+questionId)
 .transaction(data => {
    if(!data){
-      return { correct: 0, wrong: 1 };
+      return { 
+         question: q.q, // 🔥 IMPORTANTE
+         correct: 0, 
+         wrong: 1 
+      };
    }
    data.wrong++;
    return data;
@@ -679,6 +693,19 @@ result.innerText="❌ WRONG ANSWER";
 answers.appendChild(result);
 
 scoreText.innerText=score;
+
+// 🔥 AVANZAR A LA SIGUIENTE PREGUNTA (GLOBAL)
+firebase.database()
+.ref("rooms/"+roomCode)
+.transaction(data => {
+   if(!data) return data;
+
+   if(!data.questionIndex) data.questionIndex = 0;
+
+   data.questionIndex++;
+
+   return data;
+});
 
 setTimeout(()=>{
 
@@ -1030,6 +1057,9 @@ let players={};
 
 let currentQuizData = null;
 
+let questionOrder = [];
+let currentQuestionIndex = 0;
+
 function drawRanking(){
 
    let list = document.getElementById("playersList");
@@ -1323,12 +1353,38 @@ window.open("index.html?final="+roomCode, "_blank");
 
 function waitForTeacher(){
 
-// 👇 🔥 ESCUCHAR jugador seleccionado (AQUÍ VA)
+// 👇 🔥 ESCUCHAR jugador seleccionado
 firebase.database()
 .ref("rooms/"+roomCode+"/selectedPlayer")
 .on("value", snap => {
 
 selectedPlayer = snap.val();
+
+});
+
+// 🔥 NUEVO: ORDEN DE PREGUNTAS
+firebase.database()
+.ref("rooms/"+roomCode+"/questionOrder")
+.on("value", snap => {
+
+let data = snap.val();
+
+if(data){
+   questionOrder = data;
+}
+
+});
+
+// 🔥 NUEVO: INDICE ACTUAL
+firebase.database()
+.ref("rooms/"+roomCode+"/questionIndex")
+.on("value", snap => {
+
+let data = snap.val();
+
+if(data !== null){
+   currentQuestionIndex = data;
+}
 
 });
 

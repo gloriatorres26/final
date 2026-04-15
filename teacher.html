@@ -355,6 +355,8 @@ if(!minutes){
 minutes = 8;
 }
 
+generateQuestionOrder();
+
 let seconds = minutes * 60;
 
 firebase.database()
@@ -551,6 +553,37 @@ function goToStats(){
    window.open("stats.html?room="+roomCode, "_blank");
 }
   
+function generateQuestionOrder(){
+
+fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vSuZY8I3EBxrL3tML7ABICEOr2WxHuCi88co-0K0C_U7KBmqulqSHjuJnfSIrHayaVWsAEkKVmsK-mA/pub?output=csv")
+.then(res => res.text())
+.then(text => {
+
+let rows = text.split("\n").slice(1);
+
+let total = rows.length;
+
+// crear array [0,1,2,3,...]
+let order = Array.from({length: total}, (_,i)=>i);
+
+// 🔀 mezclar (shuffle)
+for(let i = order.length -1; i>0; i--){
+   let j = Math.floor(Math.random()*(i+1));
+   [order[i], order[j]] = [order[j], order[i]];
+}
+
+// guardar en Firebase
+firebase.database()
+.ref("rooms/"+roomCode)
+.update({
+   questionOrder: order,
+   questionIndex: 0
+});
+
+});
+
+}
+
 const qr = document.getElementById("qrCode");
 const modal = document.getElementById("qrModal");
 const closeBtn = document.getElementById("closeQR");
