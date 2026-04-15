@@ -1438,3 +1438,12 @@ box-shadow:0 0 15px red;
   padding: 5px 10px;
   cursor: pointer;
 }
+
+#statsContainer{
+margin-top:40px;
+}
+
+.finalTable td{
+font-family:'Press Start 2P', cursive;
+font-size:14px;
+}
