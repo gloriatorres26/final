@@ -492,6 +492,7 @@ activateRealtimeRanking();
 firebase.database()
 .ref("rooms/"+roomCode+"/players/"+playerId)
 .set({
+   id: playerId,
    name: playerName,
    score: 0
 });
@@ -955,7 +956,8 @@ function updateRanking(){
 
 if(!playerName || !roomCode) return;
 
-players[playerName]={
+players[playerId]={
+id: playerId,
 name: playerName,
 score: score
 };
@@ -966,6 +968,7 @@ drawRanking();
 firebase.database()
 .ref("rooms/"+roomCode+"/players/"+playerId)
 .set({
+   id: playerId,
    name: playerName,
    score: score
 });
