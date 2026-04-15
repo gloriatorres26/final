@@ -61,6 +61,12 @@ let playerName = "";
 
 let roomCode="";
 
+let playerId = localStorage.getItem("playerId");
+
+if(!playerId){
+   playerId = "player_" + Math.random().toString(36).substr(2,9);
+   localStorage.setItem("playerId", playerId);
+}
 
 const canvas = document.getElementById("game");
 
