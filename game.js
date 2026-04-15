@@ -983,7 +983,7 @@ if(!roomCode || !playerName) return;
 if(playerName === selectedPlayer && currentQuizData !== undefined){
 
 firebase.database()
-.ref("rooms/"+roomCode+"/gameStates/"+playerName)
+.ref("rooms/"+roomCode+"/gameStates/"+playerId)
 .set({
 board: board,
 score: score,
@@ -995,7 +995,7 @@ quiz: currentQuizData
 
 // 💤 solo score (ligero)
 firebase.database()
-.ref("rooms/"+roomCode+"/gameStates/"+playerName)
+.ref("rooms/"+roomCode+"/gameStates/"+playerId)
 .set({
 score: score
 });
@@ -1123,6 +1123,7 @@ scoreText.innerText = score;
 firebase.database()
 .ref("rooms/"+roomCode+"/players/"+playerId)
 .set({
+   id: playerId,
    name: playerName,
    score: 0
 });
