@@ -542,6 +542,15 @@ document.getElementById("timeOverSound").play();
 
 }
 
+function goToStats(){
+   if(!roomCode){
+      alert("Open a room first");
+      return;
+   }
+
+   window.open("stats.html?room="+roomCode, "_blank");
+}
+  
 const qr = document.getElementById("qrCode");
 const modal = document.getElementById("qrModal");
 const closeBtn = document.getElementById("closeQR");
