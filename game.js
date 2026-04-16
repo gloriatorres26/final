@@ -925,6 +925,8 @@ gameOverDiv.classList.remove("hidden");
 
 setTimeout(()=>{
 
+playSound("victory");
+   
 document.getElementById("gameOver").classList.add("hidden");
 
 document.getElementById("container").style.display="none";
@@ -938,18 +940,6 @@ startPixelConfetti();
 
 showFinalRanking();
 
-// 🎵 sonido victoria
-setTimeout(()=>{
-
-playSound("victory");
-
-if(victory){
-victory.currentTime = 0;
-victory.volume = 0.7;
-
-}
-   
-},5000);
 
 },5000);
 }
