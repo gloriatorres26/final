@@ -35,13 +35,14 @@ let musicSource = null;
 
 function playMusicLoop(){
 
-if(!audioCtx || !sounds["music"]) return;
+// 🛑 si ya está sonando, no hacer nada
+if(musicSource) return;
 
-stopMusic(); // por si ya había una
+if(!audioCtx || !sounds["music"]) return;
 
 musicSource = audioCtx.createBufferSource();
 musicSource.buffer = sounds["music"];
-musicSource.loop = true; // 🔥 LOOP
+musicSource.loop = true;
 
 musicSource.connect(audioCtx.destination);
 musicSource.start(0);
@@ -1347,11 +1348,12 @@ body.appendChild(row);
 
 function startGame(){
 
+if(gameStarted) return; // 🛑 EVITA QUE SE EJECUTE OTRA VEZ
+
 startScreen.style.display="none";
 
 gameStarted = true;
 
-// 🔥 INICIAR MÚSICA AQUÍ
 playMusicLoop();
 
 startGameLoop();
