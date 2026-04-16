@@ -518,26 +518,26 @@ async function loadQuestions(){
 let url="https://docs.google.com/spreadsheets/d/e/2PACX-1vSuZY8I3EBxrL3tML7ABICEOr2WxHuCi88co-0K0C_U7KBmqulqSHjuJnfSIrHayaVWsAEkKVmsK-mA/pub?output=csv";
 
 let res=await fetch(url);
-
 let text=await res.text();
 
-let rows=text.split("\n").slice(1);
+let rows = text
+.split("\n")
+.slice(1)
+.filter(r => r.trim() !== "");
 
-questions=rows.map(row=>{
+questions = rows.map(row => {
 
-let cols = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+let cols = row.split(","); // 🔥 simple y seguro
 
 return{
-
-q:cols[0],
-
-a:[cols[1],cols[2],cols[3]],
-
-correct:Number(cols[4])
-
+q: cols[0],
+a: [cols[1], cols[2], cols[3]],
+correct: Number(cols[4])
 };
 
 });
+
+console.log("✅ Preguntas cargadas:", questions.length);
 
 }
 
@@ -962,11 +962,7 @@ document.getElementById("gameOver")
 // 🔊 después de TIME OVER sonar victory
 setTimeout(()=>{
 
-if(victory){
-victory.currentTime = 0;
 playSound("victory");
-}
-
 },2000);
 
 }
