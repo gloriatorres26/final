@@ -42,16 +42,7 @@ firebase.initializeApp(firebaseConfig);
 
 </script>
   
-<script>
 
-let pass = prompt("Teacher password:");
-
-if(pass !== "teacher1230"){
-alert("Access denied");
-location.href="index.html";
-}
-
-</script>
 
 <img id="qrCode" src="qrcode.png">
 
@@ -63,6 +54,18 @@ location.href="index.html";
     <img src="qrcode.png" class="qrBig">
   
   </div>
+</div>
+
+<div id="loginBox" class="loginBox">
+
+<h2>🔒 Teacher Access</h2>
+
+<input id="passwordInput" type="password" placeholder="Enter password">
+
+<br><br>
+
+<button onclick="checkPassword()">Enter</button>
+
 </div>
   
 <!-- 🔥 CONTENEDOR REAL -->
