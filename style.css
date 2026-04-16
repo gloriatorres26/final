@@ -1447,3 +1447,23 @@ margin-top:40px;
 font-family:'Press Start 2P', cursive;
 font-size:14px;
 }
+
+.finalTable {
+    width: 90%;
+    margin: auto;
+    table-layout: fixed; /* 🔥 importante */
+}
+
+.finalTable th:nth-child(1),
+.finalTable td:nth-child(1){
+    width: 60%; /* 🔥 más espacio para la pregunta */
+    word-wrap: break-word;
+}
+
+.finalTable th:nth-child(2),
+.finalTable td:nth-child(2),
+.finalTable th:nth-child(3),
+.finalTable td:nth-child(3){
+    width: 20%;
+    text-align: center;
+}
