@@ -96,6 +96,8 @@ let maxSpeedIncreases = 3;  // máximo permitido
 let speedPenalty = 22; // cuánto acelera cuando responde mal
 let minSpeed = 400;     // velocidad mínima permitida
 
+let lastSpeedChange = 0;
+
 // ===== GAME TIMER (TIEMPO TOTAL DEL JUEGO) =====
 let gameTimeLimit = 480; // 8 minutos
 let gameTimer;
@@ -684,15 +686,22 @@ piecesForQuiz = 5;
 // 🔥 acelerar caída suavemente
 if(speedIncreaseCount < maxSpeedIncreases){
 
-    fallSpeed -= speedPenalty;
+   let now = Date.now();
 
-    if(fallSpeed < minSpeed){
-        fallSpeed = minSpeed;
-    }
+   if(now - lastSpeedChange > 3000){
 
-    speedIncreaseCount++;
+      fallSpeed -= speedPenalty;
 
-startGameLoop();
+      if(fallSpeed < minSpeed){
+         fallSpeed = minSpeed;
+      }
+
+      speedIncreaseCount++;
+
+      startGameLoop();
+
+      lastSpeedChange = now;
+   }
 }
 
 result.innerText="❌ WRONG ANSWER";
@@ -772,15 +781,22 @@ clearInterval(quizTimer);
 // ❌ no respondió → aumenta velocidad
 if(speedIncreaseCount < maxSpeedIncreases){
 
-fallSpeed -= speedPenalty;
+   let now = Date.now();
 
- if(fallSpeed < minSpeed){
-        fallSpeed = minSpeed;
-    }
+   if(now - lastSpeedChange > 3000){
 
-speedIncreaseCount++;
+      fallSpeed -= speedPenalty;
 
-startGameLoop();
+      if(fallSpeed < minSpeed){
+         fallSpeed = minSpeed;
+      }
+
+      speedIncreaseCount++;
+
+      startGameLoop();
+
+      lastSpeedChange = now;
+   }
 }
 
 hideQuiz(); // usa tu función actual para cerrar quiz
