@@ -42,7 +42,16 @@ firebase.initializeApp(firebaseConfig);
 
 </script>
   
+<script>
 
+let pass = prompt("Teacher password:");
+
+if(pass !== "teacher1230"){
+alert("Access denied");
+location.href="index.html";
+}
+
+</script>
 
 <img id="qrCode" src="qrcode.png">
 
@@ -55,21 +64,9 @@ firebase.initializeApp(firebaseConfig);
   
   </div>
 </div>
-
-<div id="loginBox" class="loginBox">
-
-<h2>🔒 Teacher Access</h2>
-
-<input id="passwordInput" type="password" placeholder="Enter password">
-
-<br><br>
-
-<button onclick="checkPassword()">Enter</button>
-
-</div>
   
 <!-- 🔥 CONTENEDOR REAL -->
-<div id="teacherContainer" style="display:none;">
+<div id="teacherContainer">
 
 <div id="teacherBox">
 
@@ -596,23 +593,6 @@ qr.addEventListener("click", () => {
   modal.classList.remove("hidden");
 });
 
-function checkPassword(){
-
-let pass = document.getElementById("passwordInput").value;
-
-if(pass === "teacher1230"){
-
-document.getElementById("loginBox").style.display = "none";
-document.getElementById("teacherContainer").style.display = "block";
-
-}else{
-
-alert("❌ Wrong password");
-
-}
-
-}
-  
 // cerrar con X
 closeBtn.addEventListener("click", () => {
   modal.classList.add("hidden");
@@ -630,6 +610,8 @@ modal.addEventListener("click", (e) => {
 </body>
 
 </html>
+
+
 
 
 
