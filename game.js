@@ -565,8 +565,16 @@ gamePaused = true;
 quiz.classList.remove("hidden");
 startQuizTimer();
 
-// elegir pregunta aleatoria
-let q = questions[Math.floor(Math.random()*questions.length)];
+// 🔥 usar orden global
+let index = questionOrder[currentQuestionIndex];
+
+// seguridad
+if(index === undefined){
+    console.log("⚠ No hay más preguntas");
+    return;
+}
+
+let q = questions[index];
 
 currentQuizData = {
 question: q.q,
