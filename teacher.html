@@ -69,7 +69,7 @@ firebase.initializeApp(firebaseConfig);
 </div>
   
 <!-- 🔥 CONTENEDOR REAL -->
-<div id="teacherContainer">
+<div id="teacherContainer" style="display:none;">
 
 <div id="teacherBox">
 
@@ -596,6 +596,23 @@ qr.addEventListener("click", () => {
   modal.classList.remove("hidden");
 });
 
+function checkPassword(){
+
+let pass = document.getElementById("passwordInput").value;
+
+if(pass === "teacher1230"){
+
+document.getElementById("loginBox").style.display = "none";
+document.getElementById("teacherContainer").style.display = "block";
+
+}else{
+
+alert("❌ Wrong password");
+
+}
+
+}
+  
 // cerrar con X
 closeBtn.addEventListener("click", () => {
   modal.classList.add("hidden");
