@@ -951,7 +951,7 @@ victory.volume = 0.7;
    
 },5000);
 
-},2000);
+},5000);
 }
 
 function gameOver(){
