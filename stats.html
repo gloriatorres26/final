@@ -50,7 +50,9 @@ let html = `
 </tr>
 `;
 
-Object.entries(data).forEach(([question, stat]) => {
+Object.entries(data).forEach(([id, stat]) => {
+
+let questionText = stat.question || id; // 🔥 usar texto real
 
 let total = stat.correct + stat.wrong;
 
@@ -59,12 +61,11 @@ let wrongPercent = Math.round((stat.wrong/total)*100);
 
 html += `
 <tr>
-<td>${question}</td>
+<td>${questionText}</td>
 <td style="color:lime">${correctPercent}%</td>
 <td style="color:red">${wrongPercent}%</td>
 </tr>
 `;
-
 });
 
 html += "</table>";
