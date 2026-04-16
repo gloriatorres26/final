@@ -431,7 +431,8 @@ let gameLoop;
 function startGameLoop(){
 
 if(gameLoop){
-clearInterval(gameLoop);
+   clearInterval(gameLoop);
+   gameLoop = null; // 🔥 importante
 }
 
 gameLoop = setInterval(update, fallSpeed);
@@ -1348,11 +1349,16 @@ body.appendChild(row);
 
 function startGame(){
 
-if(gameStarted) return; // 🛑 EVITA QUE SE EJECUTE OTRA VEZ
+if(gameStarted) return;
 
 startScreen.style.display="none";
 
 gameStarted = true;
+
+// 🔥 RESET REAL DE VELOCIDAD
+fallSpeed = 700;
+speedIncreaseCount = 0;
+lastSpeedChange = 0;
 
 playMusicLoop();
 
